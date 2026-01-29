@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CashPlant Bank – Guardrails Demo</title>
+
+<!-- Premium Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background:
+        radial-gradient(1200px 600px at 10% 10%, #7f9cf5 0%, transparent 60%),
+        radial-gradient(1200px 600px at 90% 90%, #9f7aea 0%, transparent 60%),
+        linear-gradient(180deg, #0f172a 0%, #020617 100%);
+    min-height: 100vh;
+    padding: 24px;
+    color: #0f172a;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 42px;
+    color: #f8fafc;
+}
+
+.header h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.header p {
+    margin-top: 10px;
+    font-size: 1.05rem;
+    opacity: 0.85;
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+@media (max-width: 1024px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(18px);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 35px 80px rgba(0,0,0,0.35);
+}
+
+.input-section {
+    margin-bottom: 24px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+}
+
+textarea {
+    width: 100%;
+    min-height: 120px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    padding: 16px;
+    font-size: 15px;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99,102,241,.25);
+}
+
+.toggle-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #f1f5f9;
+    padding: 14px 18px;
+    border-radius: 14px;
+    margin-bottom: 22px;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 58px;
+    height: 30px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+    background: #cbd5f5;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    left: 4px;
+    top: 4px;
+    background: white;
+    border-radius: 50%;
+    transition: .3s;
+}
+
+input:checked + .slider {
+    background: linear-gradient(135deg,#6366f1,#8b5cf6);
+}
+
+input:checked + .slider::before {
+    transform: translateX(28px);
+}
+
+.toggle-label {
+    font-weight: 600;
+}
+
+.toggle-status {
+    margin-left: auto;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 999px;
+    color: white;
+}
+
+.toggle-status.enabled {
+    background: linear-gradient(135deg,#22c55e,#16a34a);
+}
+
+.toggle-status.disabled {
+    background: linear-gradient(135deg,#ef4444,#b91c1c);
+}
+
+button {
+    width: 100%;
+    border: none;
+    border-radius: 16px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    color: white;
+    background: linear-gradient(135deg,#6366f1,#8b5cf6);
+    cursor: pointer;
+    box-shadow: 0 20px 40px rgba(99,102,241,.4);
+    transition: .3s;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 30px 60px rgba(99,102,241,.55);
+}
+
+button:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+}
+
+.spinner {
+    width: 44px;
+    height: 44px;
+    border: 4px solid #e5e7eb;
+    border-top: 4px solid #6366f1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.response-box {
+    background: #f8fafc;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 18px;
+    border-left: 6px solid #6366f1;
+}
+
+.response-text {
+    line-height: 1.6;
+    color: #475569;
+}
+
+.success-indicator {
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: white;
+}
+
+.success {
+    background: linear-gradient(135deg,#22c55e,#16a34a);
+}
+
+.failure {
+    background: linear-gradient(135deg,#ef4444,#b91c1c);
+}
+
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,.08);
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #6366f1;
+}
+
+.stat-label {
+    margin-top: 6px;
+    font-size: .85rem;
+    color: #64748b;
+}
+
+.guardrail-item {
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,.08);
+}
+
+.guardrail-item.passed { border-left: 6px solid #22c55e; }
+.guardrail-item.triggered { border-left: 6px solid #ef4444; }
+
+.guardrail-status {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+}
+
+.guardrail-status.passed {
+    background: #22c55e;
+}
+
+.guardrail-status.triggered {
+    background: #ef4444;
+}
+
+.comparison-view {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width:768px){
+    .comparison-view{grid-template-columns:1fr;}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+    <div class="header">
+        <h1>CashPlant Bank Guardrails</h1>
+        <p>Enterprise-grade AI safety & response validation</p>
+    </div>
+
+    <div class="card input-section">
+        <form id="promptForm">
+            <div class="form-group">
+                <label>Enter your prompt</label>
+                <textarea id="prompt" placeholder="Ask CashPlant Bank something…"></textarea>
+            </div>
+
+            <div class="toggle-group">
+                <div class="toggle-switch">
+                    <input type="checkbox" id="guardrailToggle" checked>
+                    <span class="slider"></span>
+                </div>
+                <span class="toggle-label">Guardrails Enabled</span>
+                <span class="toggle-status enabled" id="toggleStatus">ENABLED</span>
+            </div>
+
+            <button type="submit" id="submitBtn">SEND REQUEST</button>
+        </form>
+    </div>
+
+    <div class="main-content">
+        <div class="card" id="resultsSection">
+            <div class="loading" id="loading" style="display:none">
+                <div class="spinner"></div>
+                Processing request…
+            </div>
+            <div id="resultsContent"></div>
+        </div>
+
+        <div class="card" id="comparisonSection" style="display:none">
+            <h3 style="margin-bottom:16px">Comparison View</h3>
+            <div id="comparisonContent"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const API_ENDPOINT = `${window.location.origin}/api/v1/guardrail/combined/ask`;
+const toggle = document.getElementById('guardrailToggle');
+const toggleStatus = document.getElementById('toggleStatus');
+const promptInput = document.getElementById('prompt');
+const loading = document.getElementById('loading');
+const resultsContent = document.getElementById('resultsContent');
+const comparisonSection = document.getElementById('comparisonSection');
+const comparisonContent = document.getElementById('comparisonContent');
+const submitBtn = document.getElementById('submitBtn');
+
+toggle.addEventListener('change',()=>{
+    toggleStatus.textContent = toggle.checked ? 'ENABLED' : 'DISABLED';
+    toggleStatus.className = `toggle-status ${toggle.checked?'enabled':'disabled'}`;
+});
+
+document.getElementById('promptForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const prompt = promptInput.value.trim();
+    if(!prompt) return alert('Enter a prompt');
+
+    loading.style.display='block';
+    resultsContent.innerHTML='';
+    comparisonSection.style.display='none';
+    submitBtn.disabled=true;
+
+    try{
+        const res = await fetch(API_ENDPOINT,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({prompt,detailed:true,guardrail_enabled:toggle.checked})
+        });
+        const data = await res.json();
+        loading.style.display='none';
+        submitBtn.disabled=false;
+        renderResults(data, toggle.checked);
+        
+        // If guardrails enabled, fetch comparison
+        if(toggle.checked){
+            fetchComparison(prompt, data);
+        }
+    }catch(err){
+        loading.style.display='none';
+        submitBtn.disabled=false;
+        resultsContent.innerHTML = `<div class="response-box" style="border-left-color:#ef4444">Error: ${escapeHtml(err.message)}</div>`;
+    }
+});
+
+async function fetchComparison(prompt, withGuardrailsData){
+    comparisonSection.style.display='block';
+    comparisonContent.innerHTML='<div class="loading"><div class="spinner"></div>Fetching comparison...</div>';
+    
+    try{
+        const res = await fetch(API_ENDPOINT,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({prompt,detailed:true,guardrail_enabled:false})
+        });
+        const withoutGuardrailsData = await res.json();
+        displayComparison(withGuardrailsData, withoutGuardrailsData);
+    }catch(err){
+        comparisonContent.innerHTML = `<div class="response-box" style="border-left-color:#ef4444">Error: ${escapeHtml(err.message)}</div>`;
+    }
+}
+
+function renderResults(data, guardrailEnabled){
+    let html='';
+    
+    // Success indicator
+    if(data.success!==undefined){
+        html+=`<div class="success-indicator ${data.success?'success':'failure'}">
+            ${data.success?'✓ ALL GUARDRAILS PASSED':'✗ GUARDRAIL TRIGGERED'}
+        </div>`;
+    }
+    
+    // Response
+    if(data.response){
+        html+=`<div class="response-box">
+            <h3 style="margin-bottom:10px;font-weight:700">AI Response:</h3>
+            <div class="response-text">${escapeHtml(data.response)}</div>
+        </div>`;
+    }
+    
+    // Summary stats
+    if(data.summary){
+        html+=`<div class="summary-stats">
+            <div class="stat-card">
+                <div class="stat-value">${data.summary.total_preflight||0}</div>
+                <div class="stat-label">Preflight</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${data.summary.total_input||0}</div>
+                <div class="stat-label">Input</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${data.summary.total_output||0}</div>
+                <div class="stat-label">Output</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color:${data.summary.triggered_count>0?'#ef4444':'#22c55e'}">${data.summary.triggered_count||0}</div>
+                <div class="stat-label">Triggered</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color:#22c55e">${data.summary.passed_count||0}</div>
+                <div class="stat-label">Passed</div>
+            </div>
+        </div>`;
+    }
+    
+    // Guardrail details
+    if(data.guardrail_results && guardrailEnabled){
+        // Preflight guardrails
+        if(data.guardrail_results.preflight && data.guardrail_results.preflight.length>0){
+            html+='<div style="margin-bottom:20px"><h3 style="margin-bottom:12px;font-weight:700">🛡️ Preflight Guardrails</h3>';
+            data.guardrail_results.preflight.forEach(g=>{
+                html+=createGuardrailItem(g,'Preflight');
+            });
+            html+='</div>';
+        }
+        
+        // Input guardrails
+        if(data.guardrail_results.input && data.guardrail_results.input.length>0){
+            html+='<div style="margin-bottom:20px"><h3 style="margin-bottom:12px;font-weight:700">📥 Input Guardrails</h3>';
+            data.guardrail_results.input.forEach(g=>{
+                html+=createGuardrailItem(g,'Input');
+            });
+            html+='</div>';
+        }
+        
+        // Output guardrails
+        if(data.guardrail_results.output && data.guardrail_results.output.length>0){
+            html+='<div style="margin-bottom:20px"><h3 style="margin-bottom:12px;font-weight:700">📤 Output Guardrails</h3>';
+            data.guardrail_results.output.forEach(g=>{
+                html+=createGuardrailItem(g,'Output');
+            });
+            html+='</div>';
+        }
+    }else if(!guardrailEnabled){
+        html+=`<div class="response-box" style="border-left-color:#f59e0b">
+            <h3 style="margin-bottom:8px">⚠️ Guardrails Disabled</h3>
+            <p>Response generated without guardrail protection.</p>
+        </div>`;
+    }
+    
+    // Message
+    if(data.message){
+        html+=`<div class="response-box" style="margin-top:16px">
+            <strong>Status:</strong> ${escapeHtml(data.message)}
+        </div>`;
+    }
+    
+    resultsContent.innerHTML=html;
+}
+
+function createGuardrailItem(guardrail, stage){
+    const triggered = guardrail.triggered || false;
+    const statusClass = triggered ? 'triggered' : 'passed';
+    const statusText = triggered ? 'TRIGGERED' : 'PASSED';
+    
+    return `
+        <div class="guardrail-item ${statusClass}">
+            <div>
+                <div style="font-weight:600;margin-bottom:4px">${escapeHtml(guardrail.name||'Unknown')}</div>
+                <div style="font-size:0.85rem;color:#64748b">${stage} Stage</div>
+            </div>
+            <span class="guardrail-status ${statusClass}">${statusText}</span>
+        </div>
+    `;
+}
+
+function displayComparison(withGuardrails, withoutGuardrails){
+    const html = `
+        <div class="comparison-view">
+            <div>
+                <h4 style="margin-bottom:12px;color:#22c55e;font-weight:700">✓ With Guardrails</h4>
+                <div class="response-box" style="min-height:150px">
+                    ${withGuardrails.response ? escapeHtml(withGuardrails.response.substring(0,300)+(withGuardrails.response.length>300?'...':'')) : 'Blocked by guardrails'}
+                </div>
+                <div style="margin-top:10px;font-size:0.9rem">
+                    <strong>Status:</strong> ${withGuardrails.summary ? `${withGuardrails.summary.triggered_count} triggered, ${withGuardrails.summary.passed_count} passed` : 'N/A'}
+                </div>
+            </div>
+            <div>
+                <h4 style="margin-bottom:12px;color:#ef4444;font-weight:700">✗ Without Guardrails</h4>
+                <div class="response-box" style="min-height:150px">
+                    ${withoutGuardrails.response ? escapeHtml(withoutGuardrails.response.substring(0,300)+(withoutGuardrails.response.length>300?'...':'')) : 'No response'}
+                </div>
+                <div style="margin-top:10px;font-size:0.9rem">
+                    <strong>Status:</strong> No protection applied
+                </div>
+            </div>
+        </div>
+    `;
+    comparisonContent.innerHTML = html;
+}
+
+function escapeHtml(t){
+    const d=document.createElement('div');
+    d.textContent=t;
+    return d.innerHTML;
+}
+</script>
+</body>
+</html>

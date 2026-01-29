@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "pre_flight": {
+    "version": 1,
+    "guardrails": []
+  },
+  "input": {
+    "version": 1,
+    "guardrails": []
+  },
+  "output": {
+    "version": 1,
+    "guardrails": [
+      {
+        "name": "Hallucination Detection",
+        "config": {
+          "model": "gpt-4o",
+          "knowledge_source": "vs_hrkw839fjkd93dfk"
+        }
+      }
+    ]
+  }
+}
+

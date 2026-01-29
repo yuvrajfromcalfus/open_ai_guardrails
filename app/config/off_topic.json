@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "pre_flight": {
+    "version": 1,
+    "guardrails": []
+  },
+  "input": {
+    "version": 1,
+    "guardrails": [
+      {
+        "name": "Off Topic Prompts",
+        "config": {
+          "confidence_threshold": 0.7,
+          "model": "gpt-4o",
+          "system_prompt_details": "You are a sbi bank customer support assistant. Raise the guardrail if questions aren’t focused on customer inquiries, product support, and service-related questions."
+        }
+      }
+    ]
+  },
+  "output": {
+    "version": 1,
+    "guardrails": []
+  }
+}
