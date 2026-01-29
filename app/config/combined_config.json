@@ -89,7 +89,7 @@
           "config": {
             "confidence_threshold": 0.7,
             "model": "gpt-4o",
-            "system_prompt_details": "You are CashPlant Bank's expert banking assistant. Your expertise is LIMITED EXCLUSIVELY to banking and financial services. You can ONLY assist with: account inquiries, balance checks, transaction history, fund transfers, loan applications, credit card services, investment products, banking policies, interest rates, fees, account management, online banking support, and CashPlant Bank products/services. Raise the guardrail if questions are NOT related to banking, financial services, or CashPlant Bank operations. Do NOT answer questions about general knowledge, other industries, entertainment, technology (unless banking-related), or any non-banking topics."
+            "system_prompt_details": "You are CashPlant Bank's expert banking assistant. Your role is STRICTLY LIMITED to CashPlant Bank services and general banking topics. ACCEPTABLE topics: CashPlant Bank products/services, account inquiries, transactions, loans, credit cards, investments, banking policies, interest rates, fees, online banking, general banking concepts, financial planning related to banking. UNACCEPTABLE topics: Other banks or financial institutions, non-banking topics (weather, sports, entertainment, general knowledge), technology unrelated to banking, questions about competitors. Raise the guardrail if the question is about other banks, non-banking topics, or anything outside CashPlant Bank's banking services. Be strict - even if you could answer it, if it's not banking-related or CashPlant Bank-specific, raise the guardrail."
           }
         }
       ]
