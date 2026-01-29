@@ -391,20 +391,40 @@ document.getElementById('promptForm').addEventListener('submit',async e=>{
     submitBtn.disabled=true;
 
     try{
-        const res = await fetch(API_ENDPOINT,{
+        // Make both API calls in parallel
+        const guardrailEnabled = toggle.checked;
+        
+        // Create both fetch promises
+        const withGuardrailsPromise = fetch(API_ENDPOINT,{
             method:'POST',
             headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({prompt,detailed:true,guardrail_enabled:toggle.checked})
+            body:JSON.stringify({prompt,detailed:true,guardrail_enabled:guardrailEnabled})
         });
-        const data = await res.json();
+        
+        // Always fetch comparison (with opposite setting)
+        const withoutGuardrailsPromise = fetch(API_ENDPOINT,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({prompt,detailed:true,guardrail_enabled:!guardrailEnabled})
+        });
+        
+        // Wait for both calls to complete in parallel
+        const [withRes, withoutRes] = await Promise.all([withGuardrailsPromise, withoutGuardrailsPromise]);
+        
+        // Parse both responses
+        const withData = await withRes.json();
+        const withoutData = await withoutRes.json();
+        
+        // Hide loading and enable button
         loading.style.display='none';
         submitBtn.disabled=false;
-        renderResults(data, toggle.checked);
         
-        // If guardrails enabled, fetch comparison
-        if(toggle.checked){
-            fetchComparison(prompt, data);
-        }
+        // Display main results
+        renderResults(withData, guardrailEnabled);
+        
+        // Display comparison
+        displayComparison(withData, withoutData);
+        
     }catch(err){
         loading.style.display='none';
         submitBtn.disabled=false;
@@ -412,7 +432,11 @@ document.getElementById('promptForm').addEventListener('submit',async e=>{
     }
 });
 
+// Comparison is now handled directly in the submit handler
+// This function is kept for backward compatibility but not used
 async function fetchComparison(prompt, withGuardrailsData){
+    // This function is deprecated - comparison now happens in parallel
+    // Keeping for reference
     comparisonSection.style.display='block';
     comparisonContent.innerHTML='<div class="loading"><div class="spinner"></div>Fetching comparison...</div>';
     
@@ -535,21 +559,28 @@ function createGuardrailItem(guardrail, stage){
 }
 
 function displayComparison(withGuardrails, withoutGuardrails){
+    // Determine which is which based on guardrail_enabled flag
+    const guardrailEnabled = withGuardrails.guardrail_enabled !== false;
+    const withData = guardrailEnabled ? withGuardrails : withoutGuardrails;
+    const withoutData = guardrailEnabled ? withoutGuardrails : withGuardrails;
+    
+    comparisonSection.style.display='block';
+    
     const html = `
         <div class="comparison-view">
             <div>
                 <h4 style="margin-bottom:12px;color:#22c55e;font-weight:700">✓ With Guardrails</h4>
                 <div class="response-box" style="min-height:150px">
-                    ${withGuardrails.response ? escapeHtml(withGuardrails.response.substring(0,300)+(withGuardrails.response.length>300?'...':'')) : 'Blocked by guardrails'}
+                    ${withData.response ? escapeHtml(withData.response.substring(0,300)+(withData.response.length>300?'...':'')) : 'Blocked by guardrails'}
                 </div>
                 <div style="margin-top:10px;font-size:0.9rem">
-                    <strong>Status:</strong> ${withGuardrails.summary ? `${withGuardrails.summary.triggered_count} triggered, ${withGuardrails.summary.passed_count} passed` : 'N/A'}
+                    <strong>Status:</strong> ${withData.summary ? `${withData.summary.triggered_count} triggered, ${withData.summary.passed_count} passed` : 'N/A'}
                 </div>
             </div>
             <div>
                 <h4 style="margin-bottom:12px;color:#ef4444;font-weight:700">✗ Without Guardrails</h4>
                 <div class="response-box" style="min-height:150px">
-                    ${withoutGuardrails.response ? escapeHtml(withoutGuardrails.response.substring(0,300)+(withoutGuardrails.response.length>300?'...':'')) : 'No response'}
+                    ${withoutData.response ? escapeHtml(withoutData.response.substring(0,300)+(withoutData.response.length>300?'...':'')) : 'No response'}
                 </div>
                 <div style="margin-top:10px;font-size:0.9rem">
                     <strong>Status:</strong> No protection applied
